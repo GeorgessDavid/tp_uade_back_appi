@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es2017",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "module": "commonjs",                                /* Specify what module code is generated. */
+    "moduleResolution": "node",                     /* Specify how TypeScript looks up a file from a given module specifier. */
+    "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
+    "paths": {
+      "utils": ["src/utils/index.ts"],
+      "utils/*": ["src/utils/*"],
+      "@/*": ["src/*"],
+      "types": ["src/types/index.ts"],
+      "types/*": ["src/types/*"],
+      "service/*": ["src/service/*"],
+    },                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
+    "typeRoots": ["./src/types","./node_modules/@types"],                                  /* Specify multiple folders that act like './node_modules/@types'. */
+    "allowJs": true,                                  /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
+    "sourceMap": true,                                /* Create source map files for emitted JavaScript files. */
+    "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */
+    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    "noImplicitReturns": true,                        /* Enable error reporting for codepaths that do not explicitly return in a function. */
+    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+    "incremental": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false
+  },
+  "include": ["src/**/*", "index.ts", "src/types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts"]
+}

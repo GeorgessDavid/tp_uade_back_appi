@@ -1,0 +1,55 @@
+{
+  "name": "tp_uade_back_appi",
+  "version": "1.0.0",
+  "description": "Backend API para TP UADE",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node index.ts",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "typescript",
+    "express",
+    "api",
+    "backend"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@8.0.0",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "connect-redis": "^9.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "method-override": "^3.0.0",
+    "mysql2": "^3.15.1",
+    "nodemailer": "^7.0.7",
+    "redis": "^5.8.3",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/express-session": "^1.18.2",
+    "@types/express-validator": "^2.20.33",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/method-override": "^3.0.0",
+    "@types/node": "^24.7.0",
+    "@types/nodemailer": "^7.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
