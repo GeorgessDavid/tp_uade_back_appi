@@ -44,7 +44,6 @@ npm run dev
 ---
 ### Reserva de Citas
 * El formulario de reserva debe solicitar.
-    * Nombre y Apellido
     * Nombre y Apellido del Paciente
     * Teléfono
     * Correo electrónico.
