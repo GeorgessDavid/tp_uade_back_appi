@@ -34,6 +34,7 @@ npm run dev
 
 
 <details><summary><strong> Enunciado </strong></summary>
+
 ### Landing Page
 * La página principal debe presentar al médico, su especialidad, formación, servicios ofrecidos y datos de contacto.
 * Debe incluir un formulario o enlace que permita reservar una cita.
