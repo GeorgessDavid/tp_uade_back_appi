@@ -10,12 +10,12 @@ module.exports = function Usuario(sequelize) {
             autoIncrement: true,
             allowNull: false
         },
-        username: {
+        usuario: {
             type: DataTypes.STRING(100),
             allowNull: false,
             unique: true
         },
-        password: {
+        contrasena: {
             type: DataTypes.STRING(255),
             allowNull: false
         },

@@ -50,7 +50,7 @@ app.use(cors({
 app.use(session({
     // store: new RedisStore({ client: redisClient }), // Comentar esta línea para usar en desarrollo local.
     name: 'auth',
-    secret: String(process.env.SESSION_SECRET),
+    secret: process.env.SESSION_SECRET!,
     resave: false,
     saveUninitialized: false,
     cookie: {

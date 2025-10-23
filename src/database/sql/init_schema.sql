@@ -22,12 +22,13 @@ CREATE TABLE Rol (
 -- -----------------------------------------------------
 CREATE TABLE Usuario (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(100) NOT NULL UNIQUE,
-  password VARCHAR(255) NOT NULL,              -- hash bcrypt
+  usuario VARCHAR(100) NOT NULL UNIQUE,
+  contrasena VARCHAR(255) NOT NULL,              -- hash bcrypt
   email VARCHAR(150) NOT NULL UNIQUE,
   nombre VARCHAR(100) NOT NULL,
   apellido VARCHAR(100) NOT NULL,
   sexo_biologico ENUM('Masculino', 'Femenino') NOT NULL,
+  activo BOOLEAN DEFAULT TRUE,
   Rol_id INT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
