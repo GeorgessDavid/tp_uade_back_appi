@@ -47,3 +47,43 @@ export const login = async (req: Request, res: Response) => {
         else res.status(500).json({ message: 'Error interno del servidor' });
     }
 }
+
+export const getAllUsers = async (req: Request, res: Response) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) throw new CustomError(400, 'Errores de validación', errors.array());
+
+        const users = await service.getAllUsers();
+
+        res.status(200).json({ message: 'Usuarios obtenidos exitosamente', users });
+
+    } catch (error) {
+        if (error instanceof CustomError) res.status(error.status).json({ message: error.message, errors: error.errors });
+        else res.status(500).json({ message: 'Error interno del servidor' });
+    }
+}
+
+export const createUser = async (req: Request, res: Response) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) throw new CustomError(400, 'Errores de validación', errors.array());
+
+        const { usuario, contrasena, email, nombre, apellido, sexo_biologico, Rol_id } = req.body;
+
+        const newUser = await service.createUser({
+            usuario,
+            contrasena,
+            email,
+            nombre,
+            apellido,
+            sexo_biologico,
+            Rol_id
+        });
+
+        res.status(201).json({ message: 'Usuario creado exitosamente', user: newUser });
+
+    } catch (error) {
+        if (error instanceof CustomError) res.status(error.status).json({ message: error.message, errors: error.errors });
+        else res.status(500).json({ message: 'Error interno del servidor' });
+    }
+}

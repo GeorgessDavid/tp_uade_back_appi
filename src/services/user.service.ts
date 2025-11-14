@@ -34,3 +34,62 @@ export const loginProcess = async (usuario: string, password: string): Promise<{
         throw new Error('Internal server error');
     }
 }
+
+/**
+ * Servicio para obtener todos los usuarios activos.
+ * @returns {Promise<Partial<Usuario>[]>} -- Lista de usuarios sin contraseñas.
+ */
+export const getAllUsers = async (): Promise<Partial<Usuario>[]> => {
+    try {
+        // Obtener todos los usuarios activos, excluyendo la contraseña
+        const users: Partial<Usuario>[] = await Usuario.findAll({
+            where: { activo: true },
+            attributes: { exclude: ['contrasena'] }
+        });
+        
+        if (!users || users.length === 0) {
+            throw new CustomError(404, 'No se encontraron usuarios');
+        }
+
+        return users;
+    } catch (error) {
+        if (error instanceof CustomError) throw error;
+        console.error(error);
+        throw new Error('Error interno del servidor al obtener usuarios');
+    }
+}
+
+/**
+ * Servicio para crear un nuevo usuario.
+ * @param {Partial<Usuario>} userData -- Datos del usuario a crear.
+ * @returns {Promise<Partial<Usuario>>} -- Usuario creado sin contraseña.
+ */
+export const createUser = async (userData: Partial<Usuario>): Promise<Partial<Usuario>> => {
+    try {
+        // Verificar que el usuario no exista
+        const existingUser = await Usuario.findOne({ where: { usuario: userData.usuario } });
+        if (existingUser) throw new CustomError(400, 'El usuario ya existe');
+
+        // Verificar que el email no exista
+        const existingEmail = await Usuario.findOne({ where: { email: userData.email } });
+        if (existingEmail) throw new CustomError(400, 'El email ya está registrado');
+
+        // Hashear la contraseña
+        const hashedPassword = await bcrypt.hash(userData.contrasena!, 10);
+
+        // Crear el usuario
+        const newUser = await Usuario.create({
+            ...userData,
+            contrasena: hashedPassword,
+            activo: true
+        });
+
+        // Retornar usuario sin contraseña
+        const { contrasena, ...userWithoutPassword } = newUser.toJSON();
+        return userWithoutPassword;
+    } catch (error) {
+        if (error instanceof CustomError) throw error;
+        console.error(error);
+        throw new Error('Error interno del servidor al crear usuario');
+    }
+}
