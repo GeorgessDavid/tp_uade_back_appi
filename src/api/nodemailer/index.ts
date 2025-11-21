@@ -1,0 +1,1 @@
+export { default as notifyNewAppointment } from './messages/notifyNewAppointment';
