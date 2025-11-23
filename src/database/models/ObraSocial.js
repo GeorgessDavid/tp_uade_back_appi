@@ -14,6 +14,16 @@ module.exports = function ObraSocial(sequelize) {
             type: DataTypes.STRING(120),
             allowNull: false,
             unique: true
+        },
+        siglas: {
+            type: DataTypes.STRING(20),
+            allowNull: false,
+            unique: true
+        },
+        rna:{
+            type: DataTypes.STRING(50),
+            allowNull: false,
+            unique: true
         }
     }
 
