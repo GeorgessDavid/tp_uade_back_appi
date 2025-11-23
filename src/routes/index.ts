@@ -3,6 +3,7 @@ import userRoutes from './user.routes';
 import pacienteRoutes from './paciente.routes';
 import horarioAtencionRoutes from './horarioAtencion.routes';
 import obraSocialRoutes from './obraSocial.routes';
+import turnoRoutes from './turno.routes';
 
 const router = express.Router();
 
@@ -12,5 +13,6 @@ router.use('/api', userRoutes);
 router.use('/api', pacienteRoutes);
 router.use('/api', horarioAtencionRoutes);
 router.use('/api/obras-sociales', obraSocialRoutes);
+router.use('/api/turnos', turnoRoutes);
 
 export default router;

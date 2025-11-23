@@ -36,6 +36,8 @@ module.exports = function Turno(sequelize) {
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
+        paranoid: true, // Soft delete: mantiene integridad referencial evitando eliminación física
+        deletedAt: 'deleted_at',
         camelCase: false,
         freezeTableName: true,
         tableName: 'Turno',

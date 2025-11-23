@@ -28,10 +28,10 @@ CREATE TABLE Usuario (
   nombre VARCHAR(100) NOT NULL,
   apellido VARCHAR(100) NOT NULL,
   sexo_biologico ENUM('Masculino', 'Femenino') NOT NULL,
-  activo BOOLEAN DEFAULT TRUE,
   Rol_id INT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL COMMENT 'Soft delete (NULL = activo)',
   CONSTRAINT fk_usuario_rol FOREIGN KEY (Rol_id) REFERENCES Rol(id)
 ) ENGINE=InnoDB;
 

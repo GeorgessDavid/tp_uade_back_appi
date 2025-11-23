@@ -17,8 +17,8 @@ const { Usuario } = db;
  */
 export const loginProcess = async (usuario: string, password: string): Promise<{ user: Partial<Usuario>; token: string }> => {
     try {
-        // Buscar el usuario activo en la base de datos
-        const user: Partial<Usuario> = await Usuario.findOne({where: {usuario, activo: true}});
+        // Buscar el usuario (paranoid: true filtra automáticamente los eliminados)
+        const user: Partial<Usuario> = await Usuario.findOne({where: {usuario}});
         if (!user) throw new CustomError(401, 'Usuario o contraseña incorrectos');
 
         // Verificar la contraseña
@@ -41,9 +41,8 @@ export const loginProcess = async (usuario: string, password: string): Promise<{
  */
 export const getAllUsers = async (): Promise<Partial<Usuario>[]> => {
     try {
-        // Obtener todos los usuarios activos, excluyendo la contraseña
+        // Obtener todos los usuarios (paranoid: true filtra automáticamente los eliminados)
         const users: Partial<Usuario>[] = await Usuario.findAll({
-            where: { activo: true },
             attributes: { exclude: ['contrasena'] }
         });
         
@@ -80,8 +79,7 @@ export const createUser = async (userData: Partial<Usuario>): Promise<Partial<Us
         // Crear el usuario
         const newUser = await Usuario.create({
             ...userData,
-            contrasena: hashedPassword,
-            activo: true
+            contrasena: hashedPassword
         });
 
         // Retornar usuario sin contraseña

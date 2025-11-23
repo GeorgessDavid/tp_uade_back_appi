@@ -3,3 +3,4 @@
 export * from './user.controller';
 export * from './paciente.controller';
 export * from './obraSocial.controller';
+export * from './turno.controller';
