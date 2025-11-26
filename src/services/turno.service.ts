@@ -2,27 +2,27 @@ import db from '../database/models';
 import { CustomError } from '../error/custom.error';
 import { Turno, CreateTurnoRequest, UpdateTurnoRequest, Paciente } from '../types';
 import { Op } from 'sequelize';
+import * as PacienteService from './paciente.service';
 
 const { Turno: TurnoModel, Paciente: PacienteModel, Usuario: UsuarioModel, HorarioAtencion: HorarioAtencionModel } = db;
 
 /**
  * Servicio para buscar o crear un paciente.
+ * Reutiliza los servicios de paciente para mantener consistencia.
  * Si existe un paciente con el mismo documento, lo retorna.
  * Si no existe, lo crea con los datos proporcionados.
  */
-const findOrCreatePaciente = async (pacienteData: CreateTurnoRequest['paciente']): Promise<Paciente> => {
+const findOrCreatePaciente = async (pacienteData: CreateTurnoRequest['paciente']): Promise<any> => {
     try {
-        // Buscar paciente por documento (identificador único)
-        let paciente = await PacienteModel.findOne({
-            where: { documento: pacienteData.documento }
-        });
+        // Buscar paciente por documento usando el servicio
+        let paciente = await PacienteService.findPacienteByDocumento(pacienteData.documento);
 
-        // Si no existe, crear el paciente
+        // Si no existe, crear el paciente usando el servicio
         if (!paciente) {
-            paciente = await PacienteModel.create(pacienteData);
+            paciente = await PacienteService.createPaciente(pacienteData);
         }
 
-        return paciente.toJSON();
+        return paciente;
     } catch (error) {
         console.error(error);
         throw new Error('Error al buscar o crear paciente');
@@ -124,7 +124,7 @@ export const createTurno = async (turnoData: CreateTurnoRequest): Promise<Turno>
             estado: 'Solicitado'
         });
 
-        return nuevoTurno.toJSON();
+        return nuevoTurno;
     } catch (error) {
         if (error instanceof CustomError) throw error;
         console.error(error);
@@ -181,7 +181,7 @@ export const getAllTurnos = async (
             throw new CustomError(404, 'No se encontraron turnos');
         }
 
-        return turnos.map(t => t.toJSON());
+        return turnos;
     } catch (error) {
         if (error instanceof CustomError) throw error;
         console.error(error);
@@ -218,7 +218,7 @@ export const getTurnoById = async (id: number): Promise<Turno> => {
             throw new CustomError(404, 'Turno no encontrado');
         }
 
-        return turno.toJSON();
+        return turno;
     } catch (error) {
         if (error instanceof CustomError) throw error;
         console.error(error);

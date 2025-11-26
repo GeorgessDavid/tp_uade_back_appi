@@ -6,6 +6,30 @@ import { capitalize, emailValidator } from '../utils';
 const { Paciente: PacienteModel } = db;
 
 /**
+ * Servicio para buscar un paciente por documento.
+ * @param {string} documento -- Documento del paciente.
+ * @returns {Promise<any | null>} -- Paciente encontrado o null.
+ */
+export const findPacienteByDocumento = async (documento: string): Promise<any | null> => {
+    try {
+        const paciente = await PacienteModel.findOne({
+            where: { documento },
+            include: [
+                {
+                    association: 'obraSocial',
+                    attributes: ['id', 'nombre']
+                }
+            ]
+        });
+
+        return paciente;
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error interno del servidor al buscar paciente por documento');
+    }
+};
+
+/**
  * Servicio para obtener todos los pacientes.
  * @returns {Promise<any[]>} -- Lista de pacientes.
  */
