@@ -4,6 +4,7 @@ import { Turno, CreateTurnoRequest, UpdateTurnoRequest, Paciente } from '../type
 import { Op } from 'sequelize';
 import * as PacienteService from './paciente.service';
 import * as nodemailer from '../api/nodemailer';
+import { isDateWithinRange } from '../utils';
 
 const { Turno: TurnoModel, Paciente: PacienteModel, Usuario: UsuarioModel, HorarioAtencion: HorarioAtencionModel } = db;
 
@@ -100,6 +101,12 @@ const validarHorarioAtencion = async (fecha: string, hora: string, Profesional_i
 export const createTurno = async (turnoData: CreateTurnoRequest): Promise<Turno> => {
     try {
         const { fecha, hora, Profesional_id, paciente: pacienteData } = turnoData;
+
+        // Validar que la fecha esté dentro del rango permitido (2 semanas)
+        const validacionFecha = isDateWithinRange(fecha, 2);
+        if (!validacionFecha.valido) {
+            throw new CustomError(400, validacionFecha.mensaje);
+        }
 
         // Validar que el profesional existe
         const profesional = await UsuarioModel.findByPk(Profesional_id);
@@ -249,7 +256,7 @@ export const updateTurno = async (id: number, updateData: UpdateTurnoRequest): P
                 }
             ]
         });
-        
+
         if (!turno) {
             throw new CustomError(404, 'Turno no encontrado');
         }

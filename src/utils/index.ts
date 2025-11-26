@@ -6,3 +6,4 @@ export * from './censoredNumbers';
 export * from './dateTransform';
 export * from './nodemailer';
 export * from './wordsValidation';
+export * from './dateRangeValidator';
