@@ -1,3 +1,4 @@
+import { Paciente } from './paciente.types';
 export interface Turno {
     id: number;
     fecha: string;
@@ -12,17 +13,7 @@ export interface CreateTurnoRequest {
     hora: string;
     Profesional_id: number;
     // Datos del paciente (si no existe, se crea)
-    paciente: {
-        nombre: string;
-        apellido: string;
-        telefono?: string;
-        email?: string;
-        tipoDocumento: 'LE' | 'LC' | 'DNI';
-        sexo_biologico: 'Masculino' | 'Femenino';
-        documento: string;
-        numeroAfiliado?: string;
-        ObraSocial_id?: number;
-    };
+    paciente: Paciente;
 }
 
 export interface UpdateTurnoRequest {

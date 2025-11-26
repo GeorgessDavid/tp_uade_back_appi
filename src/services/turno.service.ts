@@ -3,6 +3,7 @@ import { CustomError } from '../error/custom.error';
 import { Turno, CreateTurnoRequest, UpdateTurnoRequest, Paciente } from '../types';
 import { Op } from 'sequelize';
 import * as PacienteService from './paciente.service';
+import * as nodemailer from '../api/nodemailer';
 
 const { Turno: TurnoModel, Paciente: PacienteModel, Usuario: UsuarioModel, HorarioAtencion: HorarioAtencionModel } = db;
 
@@ -12,10 +13,10 @@ const { Turno: TurnoModel, Paciente: PacienteModel, Usuario: UsuarioModel, Horar
  * Si existe un paciente con el mismo documento, lo retorna.
  * Si no existe, lo crea con los datos proporcionados.
  */
-const findOrCreatePaciente = async (pacienteData: CreateTurnoRequest['paciente']): Promise<any> => {
+const findOrCreatePaciente = async (pacienteData: Paciente): Promise<Paciente> => {
     try {
         // Buscar paciente por documento usando el servicio
-        let paciente = await PacienteService.findPacienteByDocumento(pacienteData.documento);
+        let paciente = await PacienteService.findPacienteByDocumento(pacienteData.documento!);
 
         // Si no existe, crear el paciente usando el servicio
         if (!paciente) {
@@ -124,6 +125,11 @@ export const createTurno = async (turnoData: CreateTurnoRequest): Promise<Turno>
             estado: 'Solicitado'
         });
 
+        const { nombre, apellido, email } = paciente;
+        
+        // Enviar notificación de nuevo turno
+        await nodemailer.notifyNewAppointment(nombre + ' ' + apellido, email!, fecha, hora);
+        
         return nuevoTurno;
     } catch (error) {
         if (error instanceof CustomError) throw error;
