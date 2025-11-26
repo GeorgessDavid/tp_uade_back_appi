@@ -126,10 +126,10 @@ export const createTurno = async (turnoData: CreateTurnoRequest): Promise<Turno>
         });
 
         const { nombre, apellido, email } = paciente;
-        
+
         // Enviar notificación de nuevo turno
         await nodemailer.notifyNewAppointment(nombre + ' ' + apellido, email!, fecha, hora);
-        
+
         return nuevoTurno;
     } catch (error) {
         if (error instanceof CustomError) throw error;
@@ -237,7 +237,19 @@ export const getTurnoById = async (id: number): Promise<Turno> => {
  */
 export const updateTurno = async (id: number, updateData: UpdateTurnoRequest): Promise<Turno> => {
     try {
-        const turno = await TurnoModel.findByPk(id);
+        const turno = await TurnoModel.findByPk(id, {
+            include: [
+                {
+                    association: 'paciente',
+                    attributes: ['nombre', 'apellido', 'email']
+                },
+                {
+                    association: 'profesional',
+                    attributes: ['nombre', 'apellido']
+                }
+            ]
+        });
+        
         if (!turno) {
             throw new CustomError(404, 'Turno no encontrado');
         }
@@ -246,16 +258,22 @@ export const updateTurno = async (id: number, updateData: UpdateTurnoRequest): P
         if (updateData.fecha || updateData.hora) {
             const nuevaFecha = updateData.fecha || turno.fecha;
             const nuevaHora = updateData.hora || turno.hora;
-
+            
             await validarHorarioAtencion(nuevaFecha, nuevaHora, turno.Profesional_id);
             await validarDisponibilidad(nuevaFecha, nuevaHora, turno.Profesional_id, id);
         }
-
+        
         // Actualizar turno
         await TurnoModel.update(updateData, { where: { id } });
 
         // Retornar turno actualizado
         const turnoActualizado = await getTurnoById(id);
+
+        const { nombre, apellido, email } = turno.paciente;
+
+        // Enviar notificación si el estado cambió a Confirmado
+        if (turnoActualizado.estado === 'Confirmado') nodemailer.notifyAppointmentConfirmed(nombre + ' ' + apellido, email!, turnoActualizado.fecha, turnoActualizado.hora, turno.profesional.nombre + ' ' + turno.profesional.apellido);
+        
         return turnoActualizado;
     } catch (error) {
         if (error instanceof CustomError) throw error;
