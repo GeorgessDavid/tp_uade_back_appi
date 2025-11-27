@@ -1,9 +1,25 @@
 import { Router } from 'express';
 import * as turnoController from '../controllers/turno.controller';
 import * as turnoValidations from '../validations/turno.validation';
+import * as middleware from '../middlewares';
 
 const router = Router();
 
+
+// Rutas públicas - no requieren autenticación
+/**
+ * POST /api/turnos
+ * Crea un nuevo turno
+ * Busca o crea el paciente automáticamente usando el documento
+ */
+router.post(
+    '/',
+    turnoValidations.createTurno,
+    turnoController.createTurno
+);
+
+// Rutas protegidas - requieren autenticación
+router.use(middleware.isLogged);
 /**
  * GET /api/turnos
  * Obtiene todos los turnos con filtros opcionales (fecha, profesional, paciente, estado)
@@ -24,16 +40,6 @@ router.get(
     turnoController.getTurnoById
 );
 
-/**
- * POST /api/turnos
- * Crea un nuevo turno
- * Busca o crea el paciente automáticamente usando el documento
- */
-router.post(
-    '/',
-    turnoValidations.createTurno,
-    turnoController.createTurno
-);
 
 /**
  * PUT /api/turnos/:id
