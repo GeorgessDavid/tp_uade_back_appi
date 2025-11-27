@@ -12,7 +12,7 @@ const JWT_SECRET: string = process.env.JWT_SECRET!;
  * @param {Response} res -- Objeto de respuesta de Express.
  * @param {NextFunction} next -- Función para pasar al siguiente middleware.
  */
-export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
+export const isLogged = (req: Request, res: Response, next: NextFunction) => {
     const { token } = req.session.auth || {};
 
     if (!token) throw new CustomError(401, 'Token de autenticación no proporcionado');
