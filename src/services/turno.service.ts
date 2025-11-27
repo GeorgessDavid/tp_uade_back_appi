@@ -21,6 +21,7 @@ const findOrCreatePaciente = async (pacienteData: Paciente): Promise<Paciente> =
 
         // Si no existe, crear el paciente usando el servicio
         if (!paciente) {
+            console.log('Paciente no encontrado, creando nuevo paciente...');
             paciente = await PacienteService.createPaciente(pacienteData);
         }
 

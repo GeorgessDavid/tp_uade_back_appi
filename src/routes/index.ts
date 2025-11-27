@@ -9,9 +9,9 @@ const router = express.Router();
 
 router.get('/status', (req,res) => res.status(200).json({status: 'OK'}));
 
-router.use('/api', userRoutes);
-router.use('/api', pacienteRoutes);
-router.use('/api', horarioAtencionRoutes);
+router.use('/api/users', userRoutes);
+router.use('/api/pacientes', pacienteRoutes);
+router.use('/api/horarios-atencion', horarioAtencionRoutes);
 router.use('/api/obras-sociales', obraSocialRoutes);
 router.use('/api/turnos', turnoRoutes);
 

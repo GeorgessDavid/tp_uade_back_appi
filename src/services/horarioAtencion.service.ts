@@ -140,19 +140,10 @@ export const calcularSlotsDisponibles = async (horarioId: number, fecha: string)
             throw new CustomError(404, 'Horario de atención no encontrado');
         }
 
-        // Validar que la fecha corresponda al día del horario
-        const diaSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        const fechaObj = new Date(fecha + 'T00:00:00');
-        const diaActual = diaSemana[fechaObj.getDay()];
-
-        if (diaActual !== horario.dia) {
-            throw new CustomError(400, `La fecha ${fecha} no corresponde al día ${horario.dia}`);
-        }
-
-        // Calcular slots - el último slot no debe ser la hora de fin
+        // Calcular todos los slots posibles según horaInicio, horaFin e intervalo
         const slots: string[] = [];
-        const [horaIni, minIni, segIni] = horario.horaInicio.split(':').map(Number);
-        const [horaFin, minFin, segFin] = horario.horaFin.split(':').map(Number);
+        const [horaIni, minIni] = horario.horaInicio.split(':').map(Number);
+        const [horaFin, minFin] = horario.horaFin.split(':').map(Number);
 
         let minutoActual = horaIni * 60 + minIni;
         const minutoFinal = horaFin * 60 + minFin;
@@ -165,7 +156,7 @@ export const calcularSlotsDisponibles = async (horarioId: number, fecha: string)
             minutoActual += horario.intervalo;
         }
 
-        // Filtrar slots ya ocupados
+        // Filtrar slots ya ocupados por turnos en esa fecha
         const turnosOcupados = await db.Turno.findAll({
             where: {
                 Profesional_id: horario.Profesional_id,

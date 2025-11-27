@@ -43,6 +43,7 @@ Inicia sesión en el sistema.
     "id": "number",
     "nombre": "string",
     "apellido": "string",
+    "email": "string",
     "Rol_id": "number"
   },
   "token": "string"
@@ -76,7 +77,8 @@ Obtiene todas las obras sociales con paginación.
     {
       "id": "number",
       "nombre": "string",
-      "descripcion": "string"
+      "siglas": "string",
+      "rna": "string"
     }
   ]
 }
@@ -95,7 +97,8 @@ Obtiene una obra social específica por ID.
   "obraSocial": {
     "id": "number",
     "nombre": "string",
-    "descripcion": "string"
+    "siglas": "string",
+    "rna": "string"
   }
 }
 ```
@@ -110,15 +113,21 @@ Obtiene todos los horarios de atención disponibles.
 **Respuesta exitosa (200):**
 ```json
 {
-  "message": "Horarios obtenidos exitosamente",
+  "message": "Horarios de atención obtenidos exitosamente",
   "horarios": [
     {
       "id": "number",
+      "dia": "string (Lunes|Martes|Miércoles|Jueves|Viernes|Sábado)",
+      "horaInicio": "string (HH:MM:SS)",
+      "horaFin": "string (HH:MM:SS)",
+      "intervalo": "number (minutos)",
       "Profesional_id": "number",
-      "dia_semana": "number",
-      "hora_inicio": "string",
-      "hora_fin": "string",
-      "duracion_turno_minutos": "number"
+      "profesional": {
+        "id": "number",
+        "nombre": "string",
+        "apellido": "string",
+        "email": "string"
+      }
     }
   ]
 }
@@ -133,41 +142,53 @@ Obtiene un horario de atención específico por ID.
 **Respuesta exitosa (200):**
 ```json
 {
-  "message": "Horario obtenido exitosamente",
+  "message": "Horario de atención obtenido exitosamente",
   "horario": {
     "id": "number",
+    "dia": "string (Lunes|Martes|Miércoles|Jueves|Viernes|Sábado)",
+    "horaInicio": "string (HH:MM:SS)",
+    "horaFin": "string (HH:MM:SS)",
+    "intervalo": "number (minutos)",
     "Profesional_id": "number",
-    "dia_semana": "number",
-    "hora_inicio": "string",
-    "hora_fin": "string",
-    "duracion_turno_minutos": "number"
+    "profesional": {
+      "id": "number",
+      "nombre": "string",
+      "apellido": "string",
+      "email": "string"
+    }
   }
 }
 ```
 
 #### `GET /api/horarios-atencion/:id/slots-disponibles`
-Calcula los slots de tiempo disponibles para un horario de atención en un rango de fechas.
+Calcula los slots de tiempo disponibles para un horario de atención en una fecha específica.
 
 **Parámetros de ruta:**
 - `id`: ID del horario de atención
 
 **Query Parameters:**
-- `fechaInicio`: Fecha de inicio (YYYY-MM-DD)
-- `fechaFin`: Fecha de fin (YYYY-MM-DD)
+- `fecha`: Fecha para calcular disponibilidad (YYYY-MM-DD) - **Requerido**
+
+**Ejemplo de request:**
+```
+GET /api/horarios-atencion/1/slots-disponibles?fecha=2024-12-15
+```
 
 **Respuesta exitosa (200):**
 ```json
 {
-  "message": "Slots disponibles calculados exitosamente",
+  "message": "Slots calculados exitosamente",
   "slots": [
-    {
-      "fecha": "string",
-      "hora": "string",
-      "disponible": "boolean"
-    }
+    "09:00:00",
+    "09:30:00",
+    "10:00:00",
+    "10:30:00",
+    "11:00:00"
   ]
 }
 ```
+
+**Nota:** Los slots se calculan basándose en `horaInicio`, `horaFin` e `intervalo` del horario, excluyendo los turnos ya ocupados para ese profesional en esa fecha.
 
 ---
 
@@ -180,21 +201,19 @@ Crea un nuevo turno. Busca o crea el paciente automáticamente usando el documen
 ```json
 {
   "fecha": "string (YYYY-MM-DD)",
-  "hora_inicio": "string (HH:MM)",
-  "hora_fin": "string (HH:MM)",
+  "hora": "string (HH:MM:SS)",
   "Profesional_id": "number",
   "paciente": {
-    "tipo_documento": "string",
-    "numero_documento": "string",
+    "tipoDocumento": "string (LE|LC|DNI)",
+    "documento": "string",
     "nombre": "string",
     "apellido": "string",
-    "fecha_nacimiento": "string (YYYY-MM-DD)",
-    "email": "string",
-    "telefono": "string",
-    "obra_social_id": "number (opcional)"
-  },
-  "motivo": "string (opcional)",
-  "notas": "string (opcional)"
+    "sexo_biologico": "string (Masculino|Femenino)",
+    "email": "string (opcional)",
+    "telefono": "string (opcional)",
+    "numeroAfiliado": "string (opcional)",
+    "ObraSocial_id": "number (opcional)"
+  }
 }
 ```
 
@@ -202,16 +221,13 @@ Crea un nuevo turno. Busca o crea el paciente automáticamente usando el documen
 ```json
 {
   "message": "Turno creado exitosamente",
-  "data": {
+  "turno": {
     "id": "number",
     "fecha": "string",
-    "hora_inicio": "string",
-    "hora_fin": "string",
-    "estado": "string",
+    "hora": "string",
+    "estado": "Solicitado",
     "Profesional_id": "number",
-    "Paciente_id": "number",
-    "motivo": "string",
-    "notas": "string"
+    "Paciente_id": "number"
   }
 }
 ```
@@ -242,6 +258,8 @@ Obtiene todos los usuarios del sistema.
       "usuario": "string",
       "nombre": "string",
       "apellido": "string",
+      "email": "string",
+      "sexo_biologico": "string (Masculino|Femenino)",
       "Rol_id": "number"
     }
   ]
@@ -258,6 +276,8 @@ Crea un nuevo usuario en el sistema.
   "contrasena": "string",
   "nombre": "string",
   "apellido": "string",
+  "email": "string",
+  "sexo_biologico": "string (Masculino|Femenino)",
   "Rol_id": "number"
 }
 ```
@@ -271,6 +291,8 @@ Crea un nuevo usuario en el sistema.
     "usuario": "string",
     "nombre": "string",
     "apellido": "string",
+    "email": "string",
+    "sexo_biologico": "string",
     "Rol_id": "number"
   }
 }
@@ -290,14 +312,15 @@ Obtiene todos los pacientes registrados.
   "pacientes": [
     {
       "id": "number",
-      "tipo_documento": "string",
-      "numero_documento": "string",
+      "tipoDocumento": "string (LE|LC|DNI)",
+      "documento": "string",
       "nombre": "string",
       "apellido": "string",
-      "fecha_nacimiento": "string",
+      "sexo_biologico": "string (Masculino|Femenino)",
       "email": "string",
       "telefono": "string",
-      "obra_social_id": "number"
+      "numeroAfiliado": "string",
+      "ObraSocial_id": "number"
     }
   ]
 }
@@ -315,14 +338,15 @@ Obtiene un paciente específico por ID.
   "message": "Paciente obtenido exitosamente",
   "paciente": {
     "id": "number",
-    "tipo_documento": "string",
-    "numero_documento": "string",
+    "tipoDocumento": "string (LE|LC|DNI)",
+    "documento": "string",
     "nombre": "string",
     "apellido": "string",
-    "fecha_nacimiento": "string",
+    "sexo_biologico": "string (Masculino|Femenino)",
     "email": "string",
     "telefono": "string",
-    "obra_social_id": "number"
+    "numeroAfiliado": "string",
+    "ObraSocial_id": "number"
   }
 }
 ```
@@ -333,14 +357,15 @@ Crea un nuevo paciente.
 **Body:**
 ```json
 {
-  "tipo_documento": "string",
-  "numero_documento": "string",
+  "tipoDocumento": "string (LE|LC|DNI, opcional)",
+  "documento": "string (opcional)",
   "nombre": "string",
   "apellido": "string",
-  "fecha_nacimiento": "string (YYYY-MM-DD)",
-  "email": "string",
-  "telefono": "string",
-  "obra_social_id": "number (opcional)"
+  "sexo_biologico": "string (Masculino|Femenino)",
+  "email": "string (opcional)",
+  "telefono": "string (opcional)",
+  "numeroAfiliado": "string (opcional)",
+  "ObraSocial_id": "number (opcional)"
 }
 ```
 
@@ -350,14 +375,15 @@ Crea un nuevo paciente.
   "message": "Paciente creado exitosamente",
   "paciente": {
     "id": "number",
-    "tipo_documento": "string",
-    "numero_documento": "string",
+    "tipoDocumento": "string",
+    "documento": "string",
     "nombre": "string",
     "apellido": "string",
-    "fecha_nacimiento": "string",
+    "sexo_biologico": "string",
     "email": "string",
     "telefono": "string",
-    "obra_social_id": "number"
+    "numeroAfiliado": "string",
+    "ObraSocial_id": "number"
   }
 }
 ```
@@ -371,14 +397,15 @@ Actualiza un paciente existente.
 **Body (todos los campos opcionales):**
 ```json
 {
-  "tipo_documento": "string",
-  "numero_documento": "string",
+  "tipoDocumento": "string (LE|LC|DNI)",
+  "documento": "string",
   "nombre": "string",
   "apellido": "string",
-  "fecha_nacimiento": "string (YYYY-MM-DD)",
+  "sexo_biologico": "string (Masculino|Femenino)",
   "email": "string",
   "telefono": "string",
-  "obra_social_id": "number"
+  "numeroAfiliado": "string",
+  "ObraSocial_id": "number"
 }
 ```
 
@@ -388,14 +415,15 @@ Actualiza un paciente existente.
   "message": "Paciente actualizado exitosamente",
   "paciente": {
     "id": "number",
-    "tipo_documento": "string",
-    "numero_documento": "string",
+    "tipoDocumento": "string",
+    "documento": "string",
     "nombre": "string",
     "apellido": "string",
-    "fecha_nacimiento": "string",
+    "sexo_biologico": "string",
     "email": "string",
     "telefono": "string",
-    "obra_social_id": "number"
+    "numeroAfiliado": "string",
+    "ObraSocial_id": "number"
   }
 }
 ```
@@ -426,32 +454,36 @@ Obtiene todos los turnos con filtros opcionales.
 - `fecha`: Filtrar por fecha (YYYY-MM-DD)
 - `Profesional_id`: Filtrar por ID de profesional
 - `Paciente_id`: Filtrar por ID de paciente
-- `estado`: Filtrar por estado (Pendiente, Confirmado, Completado, Cancelado)
+- `estado`: Filtrar por estado (Solicitado, Confirmado, En_Espera, Atendido, Cancelado)
 
 **Respuesta exitosa (200):**
 ```json
 {
   "message": "Turnos obtenidos exitosamente",
-  "data": {
-    "turnos": [
-      {
+  "turnos": [
+    {
+      "id": "number",
+      "fecha": "string",
+      "hora": "string",
+      "estado": "string",
+      "Profesional_id": "number",
+      "Paciente_id": "number",
+      "Paciente": {
         "id": "number",
-        "fecha": "string",
-        "hora_inicio": "string",
-        "hora_fin": "string",
-        "estado": "string",
-        "Profesional_id": "number",
-        "Paciente_id": "number",
-        "motivo": "string",
-        "notas": "string",
-        "Paciente": {},
-        "Profesional": {}
+        "nombre": "string",
+        "apellido": "string",
+        "documento": "string"
+      },
+      "Profesional": {
+        "id": "number",
+        "nombre": "string",
+        "apellido": "string"
       }
-    ],
-    "total": "number",
-    "offset": "number",
-    "limit": "number"
-  }
+    }
+  ],
+  "total": "number",
+  "offset": "number",
+  "limit": "number"
 }
 ```
 
@@ -465,16 +497,13 @@ Obtiene un turno específico por ID con toda su información relacionada.
 ```json
 {
   "message": "Turno obtenido exitosamente",
-  "data": {
+  "turno": {
     "id": "number",
     "fecha": "string",
-    "hora_inicio": "string",
-    "hora_fin": "string",
+    "hora": "string",
     "estado": "string",
     "Profesional_id": "number",
     "Paciente_id": "number",
-    "motivo": "string",
-    "notas": "string",
     "Paciente": {},
     "Profesional": {}
   }
@@ -491,11 +520,8 @@ Actualiza un turno existente (fecha, hora o estado).
 ```json
 {
   "fecha": "string (YYYY-MM-DD)",
-  "hora_inicio": "string (HH:MM)",
-  "hora_fin": "string (HH:MM)",
-  "estado": "string (Pendiente|Confirmado|Completado|Cancelado)",
-  "motivo": "string",
-  "notas": "string"
+  "hora": "string (HH:MM:SS)",
+  "estado": "string (Solicitado|Confirmado|En_Espera|Atendido|Cancelado)"
 }
 ```
 
@@ -503,11 +529,10 @@ Actualiza un turno existente (fecha, hora o estado).
 ```json
 {
   "message": "Turno actualizado exitosamente",
-  "data": {
+  "turno": {
     "id": "number",
     "fecha": "string",
-    "hora_inicio": "string",
-    "hora_fin": "string",
+    "hora": "string",
     "estado": "string"
   }
 }
@@ -532,18 +557,11 @@ Cancela un turno (cambia estado a Cancelado).
 **Parámetros de ruta:**
 - `id`: ID del turno
 
-**Body (opcional):**
-```json
-{
-  "motivo_cancelacion": "string"
-}
-```
-
 **Respuesta exitosa (200):**
 ```json
 {
   "message": "Turno cancelado exitosamente",
-  "data": {
+  "turno": {
     "id": "number",
     "estado": "Cancelado"
   }
@@ -561,7 +579,8 @@ Crea una nueva obra social.
 ```json
 {
   "nombre": "string",
-  "descripcion": "string (opcional)"
+  "siglas": "string",
+  "rna": "string"
 }
 ```
 
@@ -572,7 +591,8 @@ Crea una nueva obra social.
   "obraSocial": {
     "id": "number",
     "nombre": "string",
-    "descripcion": "string"
+    "siglas": "string",
+    "rna": "string"
   }
 }
 ```
@@ -587,7 +607,8 @@ Actualiza una obra social existente.
 ```json
 {
   "nombre": "string",
-  "descripcion": "string"
+  "siglas": "string",
+  "rna": "string"
 }
 ```
 
@@ -598,7 +619,8 @@ Actualiza una obra social existente.
   "obraSocial": {
     "id": "number",
     "nombre": "string",
-    "descripcion": "string"
+    "siglas": "string",
+    "rna": "string"
   }
 }
 ```
@@ -626,11 +648,11 @@ Crea un nuevo horario de atención.
 **Body:**
 ```json
 {
-  "Profesional_id": "number",
-  "dia_semana": "number (0-6, donde 0=Domingo)",
-  "hora_inicio": "string (HH:MM)",
-  "hora_fin": "string (HH:MM)",
-  "duracion_turno_minutos": "number"
+  "dia": "string (Lunes|Martes|Miércoles|Jueves|Viernes|Sábado)",
+  "horaInicio": "string (HH:MM:SS)",
+  "horaFin": "string (HH:MM:SS)",
+  "intervalo": "number (minutos entre turnos)",
+  "Profesional_id": "number"
 }
 ```
 
@@ -640,11 +662,11 @@ Crea un nuevo horario de atención.
   "message": "Horario de atención creado exitosamente",
   "horario": {
     "id": "number",
-    "Profesional_id": "number",
-    "dia_semana": "number",
-    "hora_inicio": "string",
-    "hora_fin": "string",
-    "duracion_turno_minutos": "number"
+    "dia": "string",
+    "horaInicio": "string",
+    "horaFin": "string",
+    "intervalo": "number",
+    "Profesional_id": "number"
   }
 }
 ```
@@ -658,10 +680,11 @@ Actualiza un horario de atención existente.
 **Body (campos opcionales):**
 ```json
 {
-  "dia_semana": "number",
-  "hora_inicio": "string (HH:MM)",
-  "hora_fin": "string (HH:MM)",
-  "duracion_turno_minutos": "number"
+  "dia": "string (Lunes|Martes|Miércoles|Jueves|Viernes|Sábado)",
+  "horaInicio": "string (HH:MM:SS)",
+  "horaFin": "string (HH:MM:SS)",
+  "intervalo": "number (minutos entre turnos)",
+  "Profesional_id": "number"
 }
 ```
 
@@ -671,17 +694,17 @@ Actualiza un horario de atención existente.
   "message": "Horario de atención actualizado exitosamente",
   "horario": {
     "id": "number",
-    "Profesional_id": "number",
-    "dia_semana": "number",
-    "hora_inicio": "string",
-    "hora_fin": "string",
-    "duracion_turno_minutos": "number"
+    "dia": "string",
+    "horaInicio": "string",
+    "horaFin": "string",
+    "intervalo": "number",
+    "Profesional_id": "number"
   }
 }
 ```
 
 #### `DELETE /api/horarios-atencion/:id`
-Elimina un horario de atención.
+Elimina un horario de atención (soft delete).
 
 **Parámetros de ruta:**
 - `id`: ID del horario de atención

@@ -6,10 +6,10 @@ import * as middleware from '../middlewares';
 
 // Rutas protegidas - requieren autenticación
 router.use(middleware.isLogged);
-router.get('/pacientes', controller.getAllPacientes);
-router.get('/pacientes/:id', validation.getPacienteById, controller.getPacienteById);
-router.post('/pacientes', validation.createPaciente, controller.createPaciente);
-router.put('/pacientes/:id', validation.updatePaciente, controller.updatePaciente);
-router.delete('/pacientes/:id', validation.deletePaciente, controller.deletePaciente);
+router.get('/', controller.getAllPacientes);
+router.get('/:id', validation.getPacienteById, controller.getPacienteById);
+router.post('/create', validation.createPaciente, controller.createPaciente);
+router.put('/:id', validation.updatePaciente, controller.updatePaciente);
+router.delete('/:id', validation.deletePaciente, controller.deletePaciente);
 
 export default router;

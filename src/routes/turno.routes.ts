@@ -13,7 +13,7 @@ const router = Router();
  * Busca o crea el paciente automáticamente usando el documento
  */
 router.post(
-    '/',
+    '/create',
     turnoValidations.createTurno,
     turnoController.createTurno
 );

@@ -5,14 +5,14 @@ import * as validation from '../validations';
 import * as middleware from '../middlewares';
 
 // Rutas públicas - no requieren autenticación
-router.get('/horarios-atencion', controller.getAllHorariosAtencion);
-router.get('/horarios-atencion/:id', validation.getHorarioAtencionById, controller.getHorarioAtencionById);
-router.get('/horarios-atencion/:id/slots-disponibles', validation.calcularSlotsDisponibles, controller.calcularSlotsDisponibles);
+router.get('/', controller.getAllHorariosAtencion);
+router.get('/:id', validation.getHorarioAtencionById, controller.getHorarioAtencionById);
+router.get('/:id/slots-disponibles', validation.calcularSlotsDisponibles, controller.calcularSlotsDisponibles);
 
 // Rutas protegidas - requieren autenticación
 router.use(middleware.isLogged);
-router.post('/horarios-atencion', validation.createHorarioAtencion, controller.createHorarioAtencion);
-router.put('/horarios-atencion/:id', validation.updateHorarioAtencion, controller.updateHorarioAtencion);
-router.delete('/horarios-atencion/:id', validation.deleteHorarioAtencion, controller.deleteHorarioAtencion);
+router.post('/', validation.createHorarioAtencion, controller.createHorarioAtencion);
+router.put('/:id', validation.updateHorarioAtencion, controller.updateHorarioAtencion);
+router.delete('/:id', validation.deleteHorarioAtencion, controller.deleteHorarioAtencion);
 
 export default router;

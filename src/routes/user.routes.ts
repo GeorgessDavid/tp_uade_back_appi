@@ -9,7 +9,7 @@ router.post('/login', validation.loginProcess, controller.login);
 
 // Rutas protegidas - requieren autenticación
 router.use(middleware.isLogged);
-router.get('/users', validation.getAllUsers, controller.getAllUsers);
-router.post('/users', validation.createUser, controller.createUser);
+router.get('/', validation.getAllUsers, controller.getAllUsers);
+router.post('/create', validation.createUser, controller.createUser);
 
 export default router;

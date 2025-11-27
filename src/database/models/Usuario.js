@@ -15,6 +15,14 @@ module.exports = function Usuario(sequelize) {
             allowNull: false,
             unique: true
         },
+        nombre: {
+            type: DataTypes.STRING(100),
+            allowNull: false
+        },
+        apellido: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
         contrasena: {
             type: DataTypes.STRING(255),
             allowNull: false

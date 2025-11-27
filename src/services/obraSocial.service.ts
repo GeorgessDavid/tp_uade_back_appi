@@ -2,7 +2,7 @@ import db from '../database/models';
 import { CustomError } from '../error/custom.error';
 import { ObraSocial } from '../types';
 
-const { ObraSocialModel } = db;
+const { ObraSocial: ObraSocialModel } = db;
 
 /**
  * Servicio para obtener todas las obras sociales.
