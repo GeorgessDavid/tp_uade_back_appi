@@ -1,13 +1,34 @@
+import path from 'path';
+import fs from 'fs';
+import dotenv from 'dotenv';
+
+// ⚠️ IMPORTANTE: Validar y cargar .env ANTES de importar cualquier módulo que use la DB
+const envFile = process.env.ENV_FILE || '.env';
+const envPath = path.resolve(__dirname, envFile);
+
+console.log('🔍 Validando archivo de entorno...');
+console.log(`📁 Buscando: ${envFile}`);
+
+if (!fs.existsSync(envPath)) {
+    console.error(`\x1b[31m✗ Error: El archivo ${envFile} no existe en la ruta ${envPath}\x1b[0m`);
+    console.error(`\x1b[33m💡 Sugerencia: Crea el archivo ${envFile} en la raíz del proyecto\x1b[0m`);
+    process.exit(1);
+}
+
+console.log(`✓ Archivo ${envFile} encontrado`);
+console.log('⚙️  Cargando variables de entorno...\n');
+
+dotenv.config({ path: envPath });
+
+// Ahora sí, importar módulos que dependen de la configuración
 import cors from 'cors';
 import express from 'express';
 import methodOverride from 'method-override';
 import index from './src/routes/index';
 import { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
-import { RedisStore } from 'connect-redis';
-import { createClient } from 'redis';
-import dotenv from 'dotenv';
-dotenv.config();
+// import { RedisStore } from 'connect-redis'; Se utiliza sólo para producción y despliegue en hostings serverless.
+// import { createClient } from 'redis'; 
 
 const app = express();
 const port = process.env.PORT || 3001;
