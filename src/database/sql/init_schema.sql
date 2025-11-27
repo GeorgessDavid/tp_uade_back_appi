@@ -41,8 +41,12 @@ CREATE TABLE Usuario (
 CREATE TABLE ObraSocial (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(120) NOT NULL UNIQUE,
+  siglas VARCHAR(20) NOT NULL UNIQUE,
+  rna VARCHAR(50) NOT NULL UNIQUE COMMENT 'Registro Nacional de Obras Sociales',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL COMMENT 'Soft delete (NULL = activo)',
+  INDEX ix_obrasocial_nombre (nombre)
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
@@ -61,8 +65,10 @@ CREATE TABLE Paciente (
   ObraSocial_id INT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL COMMENT 'Soft delete (NULL = activo)',
   CONSTRAINT fk_paciente_obrasocial FOREIGN KEY (ObraSocial_id) REFERENCES ObraSocial(id),
-  INDEX ix_paciente_nombre (apellido, nombre)
+  INDEX ix_paciente_nombre (apellido, nombre),
+  INDEX ix_paciente_documento (documento)
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
@@ -73,12 +79,14 @@ CREATE TABLE HorarioAtencion (
   dia ENUM('Lunes','Martes','Miércoles','Jueves','Viernes','Sábado') NOT NULL,
   horaInicio TIME NOT NULL,
   horaFin TIME NOT NULL,
-  intervalo INT NOT NULL,                       -- en minutos
+  intervalo INT NOT NULL COMMENT 'Intervalo en minutos entre turnos',
   Profesional_id INT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL COMMENT 'Soft delete (NULL = activo)',
   CONSTRAINT fk_horario_profesional FOREIGN KEY (Profesional_id) REFERENCES Usuario(id),
-  INDEX ix_horario_dia (dia)
+  INDEX ix_horario_dia (dia),
+  INDEX ix_horario_profesional (Profesional_id)
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
@@ -93,11 +101,13 @@ CREATE TABLE Turno (
   Profesional_id INT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL COMMENT 'Soft delete (NULL = activo)',
   CONSTRAINT fk_turno_paciente FOREIGN KEY (Paciente_id) REFERENCES Paciente(id),
   CONSTRAINT fk_turno_profesional FOREIGN KEY (Profesional_id) REFERENCES Usuario(id),
   UNIQUE KEY uq_turno_profesional_fecha_hora (Profesional_id, fecha, hora),
   INDEX ix_turno_fecha (fecha),
-  INDEX ix_turno_estado (estado)
+  INDEX ix_turno_estado (estado),
+  INDEX ix_turno_paciente (Paciente_id)
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
@@ -116,28 +126,30 @@ CREATE TABLE ProfesionalObraSocial (
 -- -----------------------------------------------------
 
 -- Roles
-INSERT INTO Rol (nombre, descripcion) VALUES
-('Administrador', 'Acceso total al sistema'),
-('Medico', 'Profesional que atiende pacientes'),
-('Secretaria', 'Gestiona turnos y agenda');
+INSERT INTO Rol (nombre) VALUES
+('Administrador'),
+('Medico'),
+('Secretaria');
 
--- Usuarios
-INSERT INTO Usuario (username, password, email, nombre, apellido, sexo, Rol_id) VALUES
-('admin', '$2b$10$hash_admin', 'admin@consultorio.com', 'Administrador', 'Principal', 'M', 1),
-('drgomez', '$2b$10$hash_medico', 'drgomez@consultorio.com', 'Carlos', 'Gómez', 'M', 2),
-('secretaria1', '$2b$10$hash_secretaria', 'secretaria@consultorio.com', 'María', 'López', 'F', 3);
+-- Usuarios (contraseñas hasheadas con bcrypt)
+INSERT INTO Usuario (usuario, contrasena, email, nombre, apellido, sexo_biologico, Rol_id) VALUES
+('admin', '$2b$10$UqK7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhO', 'admin@consultorio.com', 'Administrador', 'Principal', 'Masculino', 1),
+('drgomez', '$2b$10$UqK7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhO', 'drgomez@consultorio.com', 'Carlos', 'Gómez', 'Masculino', 2),
+('secretaria1', '$2b$10$UqK7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhO', 'secretaria@consultorio.com', 'María', 'López', 'Femenino', 3);
 
 -- Obras Sociales
-INSERT INTO ObraSocial (nombre) VALUES
-('OSDE'),
-('Swiss Medical'),
-('Galeno');
+INSERT INTO ObraSocial (nombre, siglas, rna) VALUES
+('Obra Social de Empleados Publicos', 'OSDE', 'RNA-0001'),
+('Swiss Medical Group', 'SWISS', 'RNA-0002'),
+('Galeno Argentina', 'GALENO', 'RNA-0003'),
+('OSECAC', 'OSECAC', 'RNA-0004'),
+('IOMA', 'IOMA', 'RNA-0005');
 
 -- Pacientes
-INSERT INTO Paciente (nombre, apellido, telefono, email, tipoDocumento, documento, numeroAfiliado, ObraSocial_id) VALUES
-('Julián', 'Pérez', '1123456789', 'julianperez@mail.com', 'DNI', '12345678', 'A001', 1),
-('María', 'Torres', '1198765432', 'mariatorres@mail.com', 'DNI', '22334455', 'B002', 2),
-('Lucía', 'González', '1176543210', 'luciagonzalez@mail.com', 'DNI', '33445566', 'C003', 3);
+INSERT INTO Paciente (nombre, apellido, telefono, email, tipoDocumento, sexo_biologico, documento, numeroAfiliado, ObraSocial_id) VALUES
+('Julián', 'Pérez', '1123456789', 'julianperez@mail.com', 'DNI', 'Masculino', '12345678', 'A001', 1),
+('María', 'Torres', '1198765432', 'mariatorres@mail.com', 'DNI', 'Femenino', '22334455', 'B002', 2),
+('Lucía', 'González', '1176543210', 'luciagonzalez@mail.com', 'DNI', 'Femenino', '33445566', 'C003', 3);
 
 -- Horarios del médico
 INSERT INTO HorarioAtencion (dia, horaInicio, horaFin, intervalo, Profesional_id) VALUES
