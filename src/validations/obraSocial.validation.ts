@@ -1,5 +1,5 @@
 const { body, param, query } = require('express-validator');
-import { onlyWords } from "utils";
+import { onlyWords } from "../utils";
 
 export const createObraSocial = [
     body('nombre').isString().withMessage('El nombre debe ser un string')
