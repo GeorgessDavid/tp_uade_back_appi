@@ -16,7 +16,7 @@ const sendNewAppointmentNotification = async (name: string, to: string, appointm
     `
 
     transporter.sendMail({
-        from: 'Dr. Martín Alejandro Suarez',
+        from: '"Dr. Martin Alejandro Suarez " <noreply@maralesuarez.com>',
         to,
         subject: 'Nueva cita programada',
         html: message

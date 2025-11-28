@@ -3,7 +3,7 @@ export interface Turno {
     id: number;
     fecha: string;
     hora: string;
-    estado: 'Solicitado' | 'Confirmado' | 'En_Espera' | 'Atendido' | 'Cancelado';
+    estado: 'Solicitado' | 'Confirmado' | 'En_Espera' | 'Atendido' | 'Cancelado' | 'Ausente';
     Paciente_id: number;
     Profesional_id: number;
 }
@@ -19,5 +19,5 @@ export interface CreateTurnoRequest {
 export interface UpdateTurnoRequest {
     fecha?: string;
     hora?: string;
-    estado?: 'Solicitado' | 'Confirmado' | 'En_Espera' | 'Atendido' | 'Cancelado';
+    estado?: 'Solicitado' | 'Confirmado' | 'En_Espera' | 'Atendido' | 'Cancelado' | 'Ausente';
 }

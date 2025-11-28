@@ -19,7 +19,7 @@ module.exports = function Turno(sequelize) {
             allowNull: false
         },
         estado: {
-            type: DataTypes.ENUM('Solicitado', 'Confirmado', 'En_Espera', 'Atendido', 'Cancelado'),
+            type: DataTypes.ENUM('Solicitado', 'Confirmado', 'En_Espera', 'Atendido', 'Cancelado', 'Ausente'),
             defaultValue: 'Solicitado'
         },
         Paciente_id: {

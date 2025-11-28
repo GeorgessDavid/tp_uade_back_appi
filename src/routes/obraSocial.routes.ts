@@ -28,13 +28,13 @@ router.get(
 );
 
 // Rutas protegidas - requieren autenticación
-// router.use(middleware.isLogged);
+router.use(middleware.isLogged);
 /**
  * POST /api/obras-sociales
  * Crea una nueva obra social
  */
 router.post(
-    '/',
+    '/create',
     obraSocialValidations.createObraSocial,
     obraSocialController.createObraSocial
 );

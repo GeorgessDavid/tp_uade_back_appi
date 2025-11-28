@@ -8,7 +8,7 @@ const notifyAppointmentConfirmed = async (name: string, to: string, appointmentD
         html: `
             <h1>Su cita médica ha sido confirmada</h1>
             <p>Estimado/a ${name},</p>
-            <p>Nos complace informarle que su cita médica ha sido confirmada con el Dr./Dra. ${professionalName}.</p>
+            <p>Nos complace informarle que su cita médica ha sido confirmada con el Dr. ${professionalName}.</p>
             <p><strong>Fecha:</strong> ${appointmentDate}</p>
             <p><strong>Hora:</strong> ${appointmentTime}</p>
             <p>Por favor, asegúrese de llegar 10 minutos antes de la hora programada.</p>

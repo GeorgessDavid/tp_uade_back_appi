@@ -5,6 +5,12 @@ import { Op, Sequelize } from 'sequelize';
 import * as PacienteService from './paciente.service';
 import * as nodemailer from '../api/nodemailer';
 import { isDateWithinRange } from '../utils';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+
+dayjs.extend(localizedFormat);
+dayjs.locale('es');
 
 const { Turno: TurnoModel, Paciente: PacienteModel, Usuario: UsuarioModel, HorarioAtencion: HorarioAtencionModel } = db;
 
@@ -136,7 +142,7 @@ export const createTurno = async (turnoData: CreateTurnoRequest): Promise<Turno>
         const { nombre, apellido, email } = paciente;
 
         // Enviar notificación de nuevo turno
-        await nodemailer.notifyNewAppointment(nombre + ' ' + apellido, email!, fecha, hora);
+        await nodemailer.notifyNewAppointment(nombre + ' ' + apellido, email!, dayjs(fecha).format('dddd, DD [de] MMMM [de] YYYY'), hora);
 
         return nuevoTurno;
     } catch (error) {
@@ -289,7 +295,7 @@ export const updateTurno = async (id: number, updateData: UpdateTurnoRequest): P
         const { nombre, apellido, email } = turno.paciente;
 
         // Enviar notificación si el estado cambió a Confirmado
-        if (turnoActualizado.estado === 'Confirmado') nodemailer.notifyAppointmentConfirmed(nombre + ' ' + apellido, email!, turnoActualizado.fecha, turnoActualizado.hora, turno.profesional.nombre + ' ' + turno.profesional.apellido);
+        if (turnoActualizado.estado === 'Confirmado') nodemailer.notifyAppointmentConfirmed(nombre + ' ' + apellido, email!, dayjs(turnoActualizado.fecha).format('dddd, DD [de] MMMM [de] YYYY'), turnoActualizado.hora, turno.profesional.nombre + ' ' + turno.profesional.apellido);
         
         return turnoActualizado;
     } catch (error) {
