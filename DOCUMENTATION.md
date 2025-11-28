@@ -1,9 +1,139 @@
 # Documentación de API - Sistema de Gestión de Turnos
 
 ## Índice
+- [Diagrama de Base de Datos](#diagrama-de-base-de-datos)
+- [Script de Inicialización](#script-de-inicialización)
 - [Endpoints Públicos](#endpoints-públicos)
 - [Endpoints Privados](#endpoints-privados-requieren-autenticación)
-- [Sugerencias de Seguridad](#sugerencias-de-seguridad)
+- [Frontend y Maquetado](#frontend-y-maquetado)
+- [Códigos de Estado HTTP](#códigos-de-estado-http)
+- [Autenticación](#autenticación)
+- [Arquitectura de la API](#notas-sobre-la-arquitectura-de-la-api)
+
+---
+
+## Diagrama de Base de Datos
+```markdown
+![Diagrama de Base de Datos](./db_diagram.png)
+```
+### Estructura de la Base de Datos
+
+El sistema utiliza **MySQL** como motor de base de datos con las siguientes entidades principales:
+
+#### Tablas Principales
+
+**1. `Rol`**
+- Gestiona los roles del sistema (Administrador, Médico, Secretaria)
+- Campos: `id`, `nombre`, `created_at`, `updated_at`
+
+**2. `Usuario`**
+- Usuarios del sistema (médicos, secretarias, administradores)
+- Campos: `id`, `usuario`, `contrasena`, `email`, `nombre`, `apellido`, `sexo_biologico`, `Rol_id`
+- **Relación**: Pertenece a un `Rol`
+- **Soft Delete**: Utiliza `deleted_at` para eliminación lógica
+
+**3. `ObraSocial`**
+- Catálogo de obras sociales disponibles
+- Campos: `id`, `nombre`, `siglas`, `rna`
+- **Soft Delete**: Utiliza `deleted_at` para eliminación lógica
+
+**4. `Paciente`**
+- Información de los pacientes
+- Campos: `id`, `nombre`, `apellido`, `telefono`, `email`, `tipoDocumento`, `sexo_biologico`, `documento`, `numeroAfiliado`, `ObraSocial_id`
+- **Relación**: Puede tener una `ObraSocial` (opcional)
+- **Soft Delete**: Utiliza `deleted_at` para eliminación lógica
+
+**5. `HorarioAtencion`**
+- Configuración de horarios de trabajo de los profesionales
+- Campos: `id`, `dia`, `horaInicio`, `horaFin`, `intervalo`, `Profesional_id`
+- **Relación**: Pertenece a un `Usuario` (profesional)
+- **Soft Delete**: Utiliza `deleted_at` para eliminación lógica
+
+**6. `Turno`**
+- Citas/turnos médicos del sistema
+- Campos: `id`, `fecha`, `hora`, `estado`, `Paciente_id`, `Profesional_id`
+- **Relaciones**: Pertenece a un `Paciente` y a un `Usuario` (profesional)
+- **Estados**: `Solicitado`, `Confirmado`, `En_Espera`, `Atendido`, `Cancelado`, `Ausente`
+- **Soft Delete**: Utiliza `deleted_at` para eliminación lógica
+
+**7. `ProfesionalObraSocial`**
+- Tabla de relación muchos-a-muchos entre profesionales y obras sociales
+- Define con qué obras sociales tiene convenio cada profesional
+- Campos: `Profesional_id`, `ObraSocial_id`
+
+### Relaciones Entre Entidades
+
+```
+Rol (1) ←--→ (N) Usuario
+Usuario (1) ←--→ (N) HorarioAtencion  [como Profesional]
+Usuario (1) ←--→ (N) Turno  [como Profesional]
+Usuario (N) ←--→ (N) ObraSocial  [tabla ProfesionalObraSocial]
+
+ObraSocial (1) ←--→ (N) Paciente  [opcional]
+Paciente (1) ←--→ (N) Turno
+
+Paciente (N) ←--→ (1) Usuario [a través de Turno]
+```
+
+### Características Técnicas
+
+- **Motor**: MySQL con InnoDB
+- **Codificación**: UTF8MB4 Unicode
+- **Soft Delete**: Las tablas principales implementan eliminación lógica
+- **Timestamps**: Todas las tablas tienen `created_at` y `updated_at` automáticos
+- **Índices**: Optimizados para consultas frecuentes (nombres, documentos, fechas)
+- **Restricciones**: 
+  - Unique constraints en campos críticos (emails, documentos, RNAs)
+  - Foreign keys con integridad referencial
+  - Unique composite en `(Profesional_id, fecha, hora)` para evitar dobles turnos
+
+---
+
+## Script de Inicialización
+
+El script completo de la base de datos se encuentra en:
+- **Archivo**: `src/database/sql/init_schema.sql`
+- **También disponible en**: `README.md` (sección "Configurar la base de datos")
+
+### Datos Iniciales Incluidos
+
+El script incluye datos de ejemplo para:
+- **3 Roles**: Administrador, Médico, Secretaria
+- **1 Usuario**: médico de ejemplo (`masuarez` / `masuarez`)
+- **5 Obras Sociales**: OSDE, Swiss Medical, Galeno, OSECAC, IOMA
+- **4 Pacientes**: datos de prueba
+- **2 Horarios de atención**: Lunes 8:00-12:00, Martes 14:00-19:00
+- **Convenios**: El médico tiene convenio con 3 obras sociales
+- **4 Turnos**: ejemplos en diferentes estados
+
+### Ejecutar el Script
+
+```sql
+-- Opción 1: Ejecutar desde MySQL Workbench o cliente gráfico
+-- Abrir y ejecutar: src/database/sql/init_schema.sql
+
+-- Opción 2: Desde línea de comandos
+mysql -u tu_usuario -p < src/database/sql/init_schema.sql
+```
+
+### Configuración de Conexión
+
+La conexión a la base de datos se configura a través de variables de entorno (`.env`):
+
+```bash
+# Configuración de Base de Datos
+DB_USER="tu_usuario_mysql"
+DB_PASSWORD="tu_contraseña_mysql" 
+DB_DATABASE="consultorio_medico"
+DB_HOST="localhost"
+DB_PORT="3306"
+DB_DIALECT="mysql"
+```
+
+**Archivo de configuración**: `src/database/config/config.cjs`
+- Utiliza **Sequelize** como ORM
+- Configuración para entornos: development, test, production
+- Soporte para **MySQL2** como driver de conexión
 
 ---
 
@@ -24,7 +154,7 @@ Verifica el estado del servidor.
 
 ### Autenticación
 
-#### `POST /api/login`
+#### `POST /api/users/login`
 Inicia sesión en el sistema.
 
 **Body:**
@@ -57,6 +187,20 @@ Inicia sesión en el sistema.
 - `usuario`
 - `nombre`
 - `apellido`
+
+#### `POST /api/users/logout`
+Cierra la sesión del usuario autenticado.
+
+**Respuesta exitosa (200):**
+```json
+{
+  "message": "Sesión cerrada exitosamente"
+}
+```
+
+**Efectos:**
+- Destruye la sesión del servidor
+- Limpia las cookies del cliente
 
 ---
 
@@ -122,6 +266,9 @@ Obtiene todos los horarios de atención disponibles.
       "horaFin": "string (HH:MM:SS)",
       "intervalo": "number (minutos)",
       "Profesional_id": "number",
+      "created_at": "2025-11-28T15:56:28.000Z",
+      "updated_at": "2025-11-28T15:56:28.000Z",
+      "deleted_at": null,
       "profesional": {
         "id": "number",
         "nombre": "string",
@@ -150,6 +297,9 @@ Obtiene un horario de atención específico por ID.
     "horaFin": "string (HH:MM:SS)",
     "intervalo": "number (minutos)",
     "Profesional_id": "number",
+    "created_at": "2025-11-28T15:56:28.000Z",
+    "updated_at": "2025-11-28T15:56:28.000Z",
+    "deleted_at": null,
     "profesional": {
       "id": "number",
       "nombre": "string",
@@ -194,7 +344,7 @@ GET /api/horarios-atencion/1/slots-disponibles?fecha=2024-12-15
 
 ### Turnos
 
-#### `POST /api/turnos`
+#### `POST /api/turnos/create`
 Crea un nuevo turno. Busca o crea el paciente automáticamente usando el documento.
 
 **Body:**
@@ -206,11 +356,11 @@ Crea un nuevo turno. Busca o crea el paciente automáticamente usando el documen
   "paciente": {
     "tipoDocumento": "string (LE|LC|DNI)",
     "documento": "string",
-    "nombre": "string",
     "apellido": "string",
-    "sexo_biologico": "string (Masculino|Femenino)",
-    "email": "string (opcional)",
+    "nombre": "string",
     "telefono": "string (opcional)",
+    "email": "string (opcional)",
+    "sexo_biologico": "string (Masculino|Femenino)",
     "numeroAfiliado": "string (opcional)",
     "ObraSocial_id": "number (opcional)"
   }
@@ -266,7 +416,7 @@ Obtiene todos los usuarios del sistema.
 }
 ```
 
-#### `POST /api/users`
+#### `POST /api/users/create`
 Crea un nuevo usuario en el sistema.
 
 **Body:**
@@ -274,9 +424,9 @@ Crea un nuevo usuario en el sistema.
 {
   "usuario": "string",
   "contrasena": "string",
+  "email": "string",
   "nombre": "string",
   "apellido": "string",
-  "email": "string",
   "sexo_biologico": "string (Masculino|Femenino)",
   "Rol_id": "number"
 }
@@ -351,7 +501,7 @@ Obtiene un paciente específico por ID.
 }
 ```
 
-#### `POST /api/pacientes`
+#### `POST /api/pacientes/create`
 Crea un nuevo paciente.
 
 **Body:**
@@ -572,7 +722,7 @@ Cancela un turno (cambia estado a Cancelado).
 
 ### Obras Sociales (Gestión Administrativa)
 
-#### `POST /api/obras-sociales`
+#### `POST /api/obras-sociales/create`
 Crea una nueva obra social.
 
 **Body:**
@@ -793,4 +943,86 @@ Estas cookies deben incluirse en las peticiones a endpoints privados.
 
 ---
 
-*Última actualización: 27 de noviembre de 2025*
+## Frontend y Maquetado
+
+### Arquitectura del Sistema
+**Este proyecto utiliza una arquitectura separada frontend-backend:**
+
+- **📁 Backend (este repositorio)**: [tp_uade_back_appi](https://github.com/GeorgessDavid/tp_uade_back_appi)
+  - API REST con Node.js + Express + TypeScript
+- **📁 Frontend (repositorio separado)**: [tp_uade_front_appi](https://github.com/GeorgessDavid/tp_uade_front_appi)
+  - Interfaz de usuario conectada a esta API
+- **🗄️ Base de Datos**: MySQL
+
+### Tecnología Backend
+- **Runtime**: Node.js + TypeScript
+- **Framework**: Express.js
+- **ORM**: Sequelize
+- **Base de Datos**: MySQL
+- **Autenticación**: Express Session + Cookies
+- **API**: RESTful JSON
+
+### Integración Frontend-Backend
+La API está configurada para comunicarse con el frontend a través de:
+
+#### CORS (Cross-Origin Resource Sharing)
+```typescript
+// Configuración en index.ts
+app.use(cors({
+    origin: process.env.FRONT_END_URL?.split(','),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type']
+}))
+```
+
+#### Variables de Entorno para Integración
+Configurar en `.env`:
+```bash
+# URL(s) del frontend para CORS (separar múltiples con comas)
+FRONT_END_URL="http://localhost:5173,http://localhost:3000"
+
+# Dominio para cookies compartidas
+DOMAIN="localhost"
+```
+
+#### Autenticación Cross-Domain
+- **Cookies de sesión** compartidas entre frontend y backend
+- **Session management** con Express Session
+- **CSRF protection** mediante configuración de cookies
+
+### Características de la Comunicación
+✅ **Peticiones CORS autorizadas** desde el frontend especificado  
+✅ **Cookies de autenticación** compartidas entre dominios  
+✅ **Respuestas JSON** estandarizadas  
+✅ **Manejo de errores** consistente  
+✅ **Validación de datos** en el backend
+
+### Configuración para Desarrollo Local
+
+**1. Configurar Backend (este repositorio):**
+```bash
+# Clonar y configurar backend
+git clone https://github.com/GeorgessDavid/tp_uade_back_appi.git
+cd tp_uade_back_appi
+pnpm install
+# Configurar .env con FRONT_END_URL="http://localhost:5173"
+pnpm dev
+```
+
+**2. Configurar Frontend:**
+```bash
+# Clonar frontend en directorio separado
+git clone https://github.com/GeorgessDavid/tp_uade_front_appi.git
+cd tp_uade_front_appi
+# Seguir instrucciones del README del frontend
+```
+
+**3. Verificar Integración:**
+- Backend ejecutándose en: `http://localhost:3001`
+- Frontend ejecutándose en: `http://localhost:5173` (o puerto configurado)
+- Verificar que `FRONT_END_URL` en el backend coincida con la URL del frontend
+
+---
+
+*Última actualización: 28 de noviembre de 2025*
