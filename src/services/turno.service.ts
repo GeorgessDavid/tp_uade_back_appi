@@ -1,7 +1,7 @@
 import db from '../database/models';
 import { CustomError } from '../error/custom.error';
 import { Turno, CreateTurnoRequest, UpdateTurnoRequest, Paciente } from '../types';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import * as PacienteService from './paciente.service';
 import * as nodemailer from '../api/nodemailer';
 import { isDateWithinRange } from '../utils';
@@ -174,10 +174,7 @@ export const getAllTurnos = async (
                     model: PacienteModel,
                     as: 'paciente',
                     include: [
-                        {
-                            model: db.ObraSocial,
-                            as: 'obraSocial'
-                        }
+                        { association: 'obraSocial' }
                     ]
                 },
                 {
@@ -188,7 +185,19 @@ export const getAllTurnos = async (
             ],
             offset,
             limit,
-            order: [['fecha', 'DESC'], ['hora', 'DESC']]
+            order: [
+                [
+                    Sequelize.literal(`CASE 
+                        WHEN estado = 'Solicitado' THEN 1 
+                        WHEN estado = 'En_Espera' THEN 2 
+                        WHEN estado = 'Confirmado' THEN 3 
+                        ELSE 4 
+                    END`), 
+                    'ASC'
+                ],
+                ['fecha', 'DESC'], 
+                ['hora', 'DESC']
+            ]
         });
 
         if (!turnos || turnos.length === 0) {
