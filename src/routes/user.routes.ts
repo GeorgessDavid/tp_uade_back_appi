@@ -6,6 +6,7 @@ import * as middleware from '../middlewares';
 
 // Rutas públicas - no requieren autenticación
 router.post('/login', validation.loginProcess, controller.login);
+router.post('/logout', controller.logout);
 
 // Rutas protegidas - requieren autenticación
 router.use(middleware.isLogged);

@@ -48,6 +48,27 @@ export const login = async (req: Request, res: Response) => {
     }
 }
 
+export const logout = async (req: Request, res: Response) => {
+    try {
+        // Destruir la sesión
+        req.session.destroy((err) => {
+            if (err) {
+                throw new CustomError(500, 'Error al cerrar sesión');
+            }
+        })
+        // Limpiar las cookies relacionadas con la sesión
+        res.clearCookie('username');
+        res.clearCookie('id');
+        res.clearCookie('token');
+        res.clearCookie('usuario');
+        res.clearCookie('nombre');
+        res.clearCookie('apellido');
+        res.status(200).json({ message: 'Cierre de sesión exitoso' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error interno del servidor al cerrar sesión' });
+    };
+}
+
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const errors = validationResult(req);
