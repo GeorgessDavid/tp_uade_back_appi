@@ -204,7 +204,37 @@ INSERT INTO Turno (fecha, hora, estado, Paciente_id, Profesional_id) VALUES
 </details>
 
 ### 4. Configurar archivo .env
-En la carpeta raíz del proyecto, antes de ejecutarlo localmente, debes configurar el archivo .env utilizando las variables de entorno que se proporcionan en el archivo *.env.example*. 
+En la carpeta raíz del proyecto, antes de ejecutarlo localmente, debes configurar el archivo .env utilizando las variables de entorno que se proporcionan en el archivo `.env.example`. 
+<details><summary>Ejemplo:</summary>
+
+```bash
+DB_PASSWORD= "contraseña_db"
+DB_DATABASE= "consultorio_medico"
+DB_HOST= "local_db_host"
+DB_PORT= "local_db_puerto"
+DB_DIALECT= "mysql"
+
+# Configuración del servidor
+PORT="3001"
+
+# JWT Secret
+JWT_SECRET="clave_para_jwt_aqui"
+
+# Session Secret
+SESSION_SECRET="clave_para_sesion_aqui"
+
+# Configuración de Nodemailer
+#⚠ Si utilizas una dirección de gmail, deberás habilitar las "contraseñas de aplicaciones" en tu cuenta de Google.
+# Más información en: https://support.google.com/accounts/answer/185833?hl=es
+NODEMAILER_USER="tu_mail@example.com"
+NODEMAILER_PASS="tu_contraseña_de_email"
+
+
+# Dominio
+DOMAIN="http://localhost:3001"
+```
+
+</details>
 
 **⚠ SI NO REALIZAS ESTE PASO EL PROYECTO NO FUNCIONARÁ**
 
