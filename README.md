@@ -7,6 +7,7 @@ Este repositorio corresponde al Back-end del TPO.
 ### Requisitos Previos
 * [Node.js](https://nodejs.org/es/download) >= Versión 18 (Recomendado LTS)
 * [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) o [pnpm](https://pnpm.io/installation).
+* [MySQL](https://dev.mysql.com/downloads/installer/)
 ### 1. Clonar el Repositorio
 ```bash
 git clone https://github.com/GeorgessDavid/tp_uade_back_appi.git
