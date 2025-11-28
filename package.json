@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "ts-node index.ts",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "typescript",
@@ -27,6 +27,7 @@
     "bcryptjs": "^3.0.2",
     "connect-redis": "^9.0.0",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
@@ -45,10 +46,15 @@
     "@types/express": "^5.0.3",
     "@types/express-session": "^1.18.2",
     "@types/express-validator": "^2.20.33",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/method-override": "^3.0.0",
     "@types/node": "^24.7.0",
     "@types/nodemailer": "^7.0.2",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

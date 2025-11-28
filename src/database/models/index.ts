@@ -42,4 +42,21 @@ Object.keys(db).forEach((modelName: string) => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+console.log('⏳ Conectando a la base de datos...');
+console.log(`📊 Entorno: ${env}`);
+console.log(`🗄️  Base de datos: ${config.database || 'N/A'}`);
+console.log(`👤 Usuario: ${config.username || 'N/A'}`);
+console.log(`🔌 Host: ${config.host || 'localhost'}:${config.port || '3306'}`);
+console.log('🔄 Intentando autenticar...');
+
+sequelize.authenticate()
+    .then(() => {
+        console.log('✓ Conexión a la base de datos establecida con éxito');
+        console.log('✅ Listo para aceptar consultas');
+    })
+    .catch((error: Error) => {
+        console.error('✗ No se pudo conectar a la base de datos:', error.message);
+        console.error('❌ Conexión fallida. Verifique la configuración y que el servidor de base de datos esté en funcionamiento.');
+    });
+
 export default db;

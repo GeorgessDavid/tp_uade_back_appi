@@ -1,2 +1,4 @@
-// Servicios - lógica de negocio reutilizable
-// Los servicios se exportarán aquí según se vayan creando
+export * from './user.service';
+export * from './paciente.service';
+export * from './obraSocial.service';
+export * from './turno.service';
