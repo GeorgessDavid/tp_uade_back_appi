@@ -229,9 +229,12 @@ SESSION_SECRET="clave_para_sesion_aqui"
 NODEMAILER_USER="tu_mail@example.com"
 NODEMAILER_PASS="tu_contraseña_de_email"
 
-
 # Dominio
-DOMAIN="http://localhost:3001"
+DOMAIN="localhost"
+
+#Front-end URL
+FRONT_END_URL="http://localhost:5173"
+
 ```
 
 </details>
