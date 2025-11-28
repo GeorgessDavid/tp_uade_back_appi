@@ -96,7 +96,7 @@ CREATE TABLE Turno (
   id INT AUTO_INCREMENT PRIMARY KEY,
   fecha DATE NOT NULL,
   hora TIME NOT NULL,
-  estado ENUM('Solicitado','Confirmado','En_Espera','Atendido','Cancelado') DEFAULT 'Solicitado',
+  estado ENUM('Solicitado','Confirmado','En_Espera','Atendido','Cancelado','Ausente') DEFAULT 'Solicitado',
   Paciente_id INT NOT NULL,
   Profesional_id INT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -126,45 +126,44 @@ CREATE TABLE ProfesionalObraSocial (
 -- -----------------------------------------------------
 
 -- Roles
-INSERT INTO Rol (nombre) VALUES
-('Administrador'),
-('Medico'),
-('Secretaria');
+INSERT INTO `rol` (`id`, `nombre`, `created_at`, `updated_at`) VALUES
+	(1, 'Administrador', '2025-11-27 15:57:42', '2025-11-27 15:57:42'),
+	(2, 'Medico', '2025-11-27 15:57:42', '2025-11-27 15:57:42'),
+	(3, 'Secretaria', '2025-11-27 15:57:42', '2025-11-27 15:57:42');
 
 -- Usuarios (contraseñas hasheadas con bcrypt)
-INSERT INTO Usuario (usuario, contrasena, email, nombre, apellido, sexo_biologico, Rol_id) VALUES
-('admin', '$2b$10$UqK7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhO', 'admin@consultorio.com', 'Administrador', 'Principal', 'Masculino', 1),
-('drgomez', '$2b$10$UqK7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhO', 'drgomez@consultorio.com', 'Carlos', 'Gómez', 'Masculino', 2),
-('secretaria1', '$2b$10$UqK7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhVX9Z8tQxhOJ7p9Z8tQxhO', 'secretaria@consultorio.com', 'María', 'López', 'Femenino', 3);
+INSERT INTO `usuario` (`id`, `usuario`, `contrasena`, `email`, `nombre`, `apellido`, `sexo_biologico`, `Rol_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(1, 'masuarez', '$2b$10$ielhEwR.cArwgivrPLJYeOe2KyOaEdtc7X3f9wgupg6.3YS.Eu7Mu', 'maralesuarez56@gmail.com', 'Martín Alejandro', 'Suarez', 'Masculino', 2, '2025-11-28 18:54:55', '2025-11-28 16:36:34', NULL);
 
 -- Obras Sociales
-INSERT INTO ObraSocial (nombre, siglas, rna) VALUES
-('Obra Social de Empleados Publicos', 'OSDE', 'RNA-0001'),
-('Swiss Medical Group', 'SWISS', 'RNA-0002'),
-('Galeno Argentina', 'GALENO', 'RNA-0003'),
-('OSECAC', 'OSECAC', 'RNA-0004'),
-('IOMA', 'IOMA', 'RNA-0005');
+INSERT INTO `obrasocial` (`id`, `nombre`, `siglas`, `rna`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(1, 'Obra Social de Empleados Publicos', 'OSDE', 'RNA-0001', '2025-11-27 15:57:42', '2025-11-28 18:43:38', NULL),
+	(2, 'Swiss Medical Group', 'SWISS', 'RNA-0002', '2025-11-27 15:57:42', '2025-11-28 15:49:15', NULL),
+	(3, 'Galeno Argentina', 'GALENO', 'RNA-0003', '2025-11-27 15:57:42', '2025-11-28 15:49:19', NULL),
+	(4, 'Obra Social de Empleados de Comercio', 'OSECAC', 'RNA-0004', '2025-11-27 15:57:42', '2025-11-27 15:57:42', NULL),
+	(5, 'Instituto de Obra Médico Asistencial', 'IOMA', 'RNA-0005', '2025-11-27 15:57:42', '2025-11-27 15:57:42', NULL);
 
 -- Pacientes
-INSERT INTO Paciente (nombre, apellido, telefono, email, tipoDocumento, sexo_biologico, documento, numeroAfiliado, ObraSocial_id) VALUES
-('Julián', 'Pérez', '1123456789', 'julianperez@mail.com', 'DNI', 'Masculino', '12345678', 'A001', 1),
-('María', 'Torres', '1198765432', 'mariatorres@mail.com', 'DNI', 'Femenino', '22334455', 'B002', 2),
-('Lucía', 'González', '1176543210', 'luciagonzalez@mail.com', 'DNI', 'Femenino', '33445566', 'C003', 3);
+INSERT INTO `paciente` (`id`, `nombre`, `apellido`, `telefono`, `email`, `tipoDocumento`, `sexo_biologico`, `documento`, `numeroAfiliado`, `ObraSocial_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(6, 'Martín', 'Roldán', '1156982431', 'martin.roldan84@gmail.com', 'DNI', 'Masculino', '28459377', '1123459082', 1, '2025-11-28 19:31:12', '2025-11-28 19:31:12', NULL),
+	(7, 'Gabriela', 'Sarmiento', '1173469981', 'g.sarmiento92@yahoo.com', 'LE', 'Femenino', '12844219', '2245917704', 3, '2025-11-28 19:33:25', '2025-11-28 19:33:25', NULL),
+	(8, 'Nicolás', 'Ferreyra', '1140275589', 'nico.ferreyra78@hotmail.com', 'DNI', 'Masculino', '22957634', '3311786240', 4, '2025-11-28 19:34:48', '2025-11-28 19:34:48', NULL),
+	(9, 'Georges Ammiel', 'David', '1150372163', 'georgessdavid@gmail.com', 'DNI', 'Masculino', '41223249', '98498654133', 1, '2025-11-28 19:41:29', '2025-11-28 19:41:29', NULL);
 
 -- Horarios del médico
-INSERT INTO HorarioAtencion (dia, horaInicio, horaFin, intervalo, Profesional_id) VALUES
-('Lunes', '08:00:00', '12:00:00', 30, 2),
-('Miércoles', '08:00:00', '12:00:00', 30, 2),
-('Viernes', '14:00:00', '18:00:00', 30, 2);
+INSERT INTO `horarioatencion` (`id`, `dia`, `horaInicio`, `horaFin`, `intervalo`, `Profesional_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(1, 'Lunes', '08:00:00', '12:00:00', 15, 1, '2025-11-28 15:56:28', '2025-11-28 15:56:28', NULL),
+	(2, 'Martes', '14:00:00', '19:00:00', 15, 1, '2025-11-28 15:56:55', '2025-11-28 16:25:59', NULL);
 
 -- Convenios médico–obra social
-INSERT INTO ProfesionalObraSocial (Profesional_id, ObraSocial_id) VALUES
-(2, 1),
-(2, 2),
-(2, 3);
+INSERT INTO `profesionalobrasocial` (`Profesional_id`, `ObraSocial_id`) VALUES
+	(1, 3);
+	(1, 4);
+	(1, 5);
 
 -- Turnos iniciales
-INSERT INTO Turno (fecha, hora, estado, Paciente_id, Profesional_id) VALUES
-('2025-10-24', '08:00:00', 'Solicitado', 1, 2),
-('2025-10-24', '08:30:00', 'Confirmado', 2, 2),
-('2025-10-25', '09:00:00', 'En_Espera', 3, 2);
+INSERT INTO `turno` (`id`, `fecha`, `hora`, `estado`, `Paciente_id`, `Profesional_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(8, '2025-12-01', '08:30:00', 'Atendido', 6, 1, '2025-11-28 19:31:12', '2025-11-28 16:35:10', NULL),
+	(9, '2025-12-09', '16:45:00', 'Atendido', 7, 1, '2025-11-28 19:33:25', '2025-11-28 16:35:18', NULL),
+	(10, '2025-12-02', '14:30:00', 'Cancelado', 8, 1, '2025-11-28 19:34:48', '2025-11-28 16:35:20', NULL),
+	(11, '2025-12-02', '15:00:00', 'Solicitado', 9, 1, '2025-11-28 19:41:29', '2025-11-28 20:06:12', NULL);
