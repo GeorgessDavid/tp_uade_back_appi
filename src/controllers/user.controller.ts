@@ -33,12 +33,36 @@ export const login = async (req: Request, res: Response) => {
         //      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', 
         //      httpOnly: false 
         // });
-        res.cookie('username', usuario);
-        res.cookie('id', id);
-        res.cookie('token', token);
-        res.cookie('usuario', usuario);
-        res.cookie('nombre', nombre);
-        res.cookie('apellido', apellido);
+        res.cookie('id', id, {
+            domain: process.env.DOMAIN,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            httpOnly: false
+        });
+        res.cookie('token', token, {
+            domain: process.env.DOMAIN,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            httpOnly: false
+        });
+        res.cookie('usuario', usuario, {
+            domain: process.env.DOMAIN,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            httpOnly: false
+        });
+        res.cookie('nombre', nombre, {
+            domain: process.env.DOMAIN,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            httpOnly: false
+        });
+        res.cookie('apellido', apellido, {
+            domain: process.env.DOMAIN,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            httpOnly: false
+        });
 
         res.status(200).json({ message: 'Inicio de sesión exitoso', user, token });
 
